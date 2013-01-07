@@ -61,10 +61,7 @@ void KernelPatcher_start()
 	// NOTE: following is currently 32bit only
 	register_kernel_patch(patch_lapic_configure,        KERNEL_32, CPUID_MODEL_ANY);
     
-    /** NOTE: Currenly causes an issue, need to be fixed for 64bit **/
 	register_kernel_patch(patch_readStartupExtensions,  KERNEL_ANY, CPUID_MODEL_ANY);
-	//register_kernel_patch(patch_readStartupExtensions,  KERNEL_32, CPUID_MODEL_ANY);
-    //    register_kernel_patch(patch_readStartupExtensions64,  KERNEL_64, CPUID_MODEL_ANY);
     
     register_kernel_patch(patch_pmKextRegister,        KERNEL_ANY, CPUID_MODEL_ANY);
     //register_kernel_patch(patch_pmCPUExitHaltToOff,        KERNEL_ANY, CPUID_MODEL_ANY);
