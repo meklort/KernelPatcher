@@ -38,6 +38,22 @@ section_t* kernelSections = NULL;
 //kernSymbols_t* kernelSymbols = NULL;
 symbolList_t*   kernelSymbols = NULL;
 
+
+/*
+ * Return the symbol specified by the index.
+ */
+symbolList_t* lookup_symbol_id(UInt32 index)
+{
+	symbolList_t* entry = moduleSymbols;
+    while(index && entry)
+    {
+        entry = entry->next;
+        index--;
+    }
+    return entry;
+}
+
+
 typedef struct sectionList_t
 {
 	bool is64;
@@ -93,23 +109,6 @@ long long add_symbol_kmod(char* symbol, long long addr, char is64)
     else             last->next = entry;
 
     return UNKNOWN_ADDRESS;
-}
-
-
-#if 0
-void loadKernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3, void *arg4)
-
-{
-	int arch = determineKernelArchitecture(kernelBinary);
-	
-	if(arch == KERNEL_ERR)
-	{
-		printf(HEADER "Unable to patch unknown architecture\n");
-		return;
-	}
-	
-	if(arch == KERNEL_32) load32KernelPatcherKexts(kernelBinary, kernelFinal, arg3, arg4);
-	if(arch == KERNEL_64) load64KernelPatcherKexts(kernelBinary, kernelFinal, arg3, arg4);
 }
 
 void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3, void *arg4)
@@ -202,7 +201,7 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
                                         
                                         while(kextSections)
                                         {  
-                                            fileSection = kextSections->section;
+                                            fileSection = kextSections->data.section;
                                             //printf("nreloc = %d at 0x%X\n", fileSection->nreloc, (UInt32)fileSection->reloff);
                                             //printf("Reloc at 0x%X\n", ((UInt32)kextBase) + ((UInt32)fileSection->reloff));
                                             struct relocation_info* relinfo = (struct relocation_info*)((UInt32)kextBase + (UInt32)fileSection->reloff);
@@ -338,16 +337,34 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
 
 void load64KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3, void *arg4)
 {
+    printf(HEADER "Returning...\n");
+    pause();
 }
-	
-	
 
-#else
+
+
+
+
+
 void loadKernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3, void *arg4)
+
 {
+	int arch = determineKernelArchitecture(kernelBinary);
+	
+	if(arch == KERNEL_ERR)
+	{
+		printf(HEADER "Unable to patch unknown architecture\n");
+		return;
+	}
+	
+    
+    
+	if(arch == KERNEL_32) load32KernelPatcherKexts(kernelBinary, kernelFinal, arg3, arg4);
+	if(arch == KERNEL_64) load64KernelPatcherKexts(kernelBinary, kernelFinal, arg3, arg4);
 }
-#endif
-/*
+
+	
+	/*
  * Register a kerenl patch
  */
 void register_kernel_patch(void* patch, int arch, int cpus)
