@@ -73,6 +73,7 @@ void KernelPatcher_start()
     
 	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_ANY, CPUID_MODEL_ANY);
 	register_kernel_patch(patch_lapic_init,             KERNEL_ANY, CPUID_MODEL_ANY);
+	register_kernel_patch(patch_lapic_interrupt,             KERNEL_ANY, CPUID_MODEL_ANY);
     
 	// NOTE: following is currently 32bit only
 	register_kernel_patch(patch_lapic_configure,        KERNEL_32, CPUID_MODEL_ANY);
