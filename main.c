@@ -30,11 +30,145 @@ enum NXByteOrder {
 
 #include "include/kernel_patcher.h"
 #include "../../boot2/modules.h"
+
 #include "../../libsaio/platform.h"
 
 cpu_type_t archCpuType=CPU_TYPE_X86_64;
 
 int show_help(int argc, const char * argv[]);
+
+/*static*/ unsigned long Adler32( unsigned char * buffer, long length );
+
+
+/*
+ * lzss.c
+ */
+extern int decompress_lzss(u_int8_t *dst, u_int8_t *src, u_int32_t srclen);
+extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+
+struct compressed_kernel_header {
+    u_int32_t signature;
+    u_int32_t compress_type;
+    u_int32_t adler32;
+    u_int32_t uncompressed_size;
+    u_int32_t compressed_size;
+    u_int32_t reserved[11];
+    char      platform_name[64];
+    char      root_path[256];
+    u_int8_t  data[0];
+};
+typedef struct compressed_kernel_header compressed_kernel_header;
+
+/*static*/ unsigned long
+Adler32( unsigned char * buffer, long length )
+{
+    long          cnt;
+    unsigned long result, lowHalf, highHalf;
+    
+    lowHalf  = 1;
+    highHalf = 0;
+    
+	for ( cnt = 0; cnt < length; cnt++ )
+    {
+        if ((cnt % 5000) == 0)
+        {
+            lowHalf  %= 65521L;
+            highHalf %= 65521L;
+        }
+        
+        lowHalf  += buffer[cnt];
+        highHalf += lowHalf;
+    }
+    
+	lowHalf  %= 65521L;
+	highHalf %= 65521L;
+    
+	result = (highHalf << 16) | lowHalf;
+    
+	return result;
+}
+
+long
+DecodeKernel(void *binary)
+{
+	compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
+	u_int32_t uncompressed_size, size;
+	void *buffer;
+    u_int8_t* dstEnd;
+	
+#if 1
+	printf("kernel header:\n");
+	printf("signature: 0x%x\n", kernel_header->signature);
+	printf("compress_type: 0x%x\n", kernel_header->compress_type);
+	printf("adler32: 0x%x\n", OSSwapBigToHostInt32(kernel_header->adler32));
+	printf("uncompressed_size: 0x%x\n", OSSwapBigToHostInt32(kernel_header->uncompressed_size));
+	printf("compressed_size: 0x%x\n", OSSwapBigToHostInt32(kernel_header->compressed_size));
+#endif
+	
+	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
+	{
+        printf("Found compressed kernel, won't recompress for now..\n");
+		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
+		{
+			printf("kernel compression is bad\n");
+			return -1;
+		}
+        
+#if NOTDEF
+		if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name))
+			return -1;
+		if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path))
+			return -1;
+#endif
+		uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
+		binary = buffer = malloc(uncompressed_size);
+		
+		size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
+							   OSSwapBigToHostInt32(kernel_header->compressed_size));
+		if (uncompressed_size != size) {
+			printf("size mismatch from lzss: %x\n", size);
+			return -1;
+		}
+		
+		if (OSSwapBigToHostInt32(kernel_header->adler32) !=
+			Adler32(binary, uncompressed_size))
+		{
+			printf("adler mismatch\n");
+			return -1;
+		}
+	}
+	
+    // Notify modules that the kernel has been decompressed, thinned and is about to be decoded
+	execute_hook("DecodeKernel", (void*)binary, NULL, NULL, NULL);
+    
+    //extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
+    dstEnd =
+    compress_lzss(&kernel_header->data[0],
+                  OSSwapBigToHostInt32(kernel_header->compressed_size),
+                  (u_int8_t*)binary,
+                  OSSwapBigToHostInt32(kernel_header->uncompressed_size));
+    if(!dstEnd)
+    {
+        printf("Error: Unable to recompress kernel.");
+    }
+    else
+    {
+        printf("Total size = %d bytes %x\n", (int)((void*)dstEnd - (void*)&kernel_header->data[0]), dstEnd - &kernel_header->data[0]);
+        int compressed_size = dstEnd - &kernel_header->data[0];
+        if(compressed_size > OSSwapBigToHostInt32(kernel_header->compressed_size))
+        {
+            printf("ERROR: Unable to recompress image to same size as before, need to remake binary.");
+        }
+        else
+        {
+            kernel_header->compressed_size = OSSwapHostToBigInt32(compressed_size);
+            kernel_header->adler32 = OSSwapHostToBigInt32(Adler32(binary, uncompressed_size));
+        }
+    }
+    //TODO: compress_lzss if it was compressed previously
+    return 0;
+}
+
 void KernelPatcher_start();
 
 PlatformInfo_t    Platform;
@@ -100,7 +234,8 @@ int main (int argc, const char * argv[])
 				
 				void* subkernel_data = (char*)kernel_data + OSSwapBigToHostInt32(kernel_hdr->offset);
 
-				execute_hook("DecodeKernel", subkernel_data, NULL, NULL, NULL);
+				//execute_hook("DecodeKernel", subkernel_data, NULL, NULL, NULL);
+                DecodeKernel(subkernel_data);
 				printf("\n");
 
 			}
