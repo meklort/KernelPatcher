@@ -17,7 +17,7 @@ include ../MakeInc.dir
 
 #all: ${SYMROOT}/xnu_patcher
 
-xnu_patcher: ${OBJROOT} $(addprefix $(OBJROOT)/, $(PATCHER_OBJS)) $(OBJROOT)/../../boot2/modules.o
+xnu_patcher: ${OBJROOT} $(addprefix $(OBJROOT)/, $(PATCHER_OBJS)) $(OBJROOT)/../../boot2/modules.o $(OBJROOT)/../../boot2/lzss.o
 	@echo "\t[LD] $@"
 	@$(CC) -arch i386 $(filter %.o,$^) -o $@
 	@rm $(OBJROOT)/main.o
