@@ -580,18 +580,9 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
 
 int determineKernelArchitecture(void* kernelData)
 {	
-	if(((struct mach_header*)kernelData)->magic == MH_MAGIC)
-	{
-		return KERNEL_32;
-	}
-	if(((struct mach_header*)kernelData)->magic == MH_MAGIC_64)
-	{
-		return KERNEL_64;
-	}
-	else
-	{
-		return KERNEL_ERR;
-	}
+	if(((struct mach_header*)kernelData)->magic == MH_MAGIC)    return KERNEL_32;
+	if(((struct mach_header*)kernelData)->magic == MH_MAGIC_64) return KERNEL_64;
+	else                                                        return KERNEL_ERR;
 }
 
 

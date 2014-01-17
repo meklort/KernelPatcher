@@ -24,15 +24,10 @@
  **/
 void patch_readStartupExtensions(void* kernelData)
 {
-	int arch = determineKernelArchitecture(kernelData);
-
-    bool is64bit = (arch == KERNEL_64);
-    //msglog("patch_readStartupExtensions\n");
- 
     UInt8* bytes = (UInt8*)kernelData;
-
-    symbolList_t* getsegbyname     = lookup_kernel_symbol("_getsegbyname");
-    symbolList_t* readBooterExtensions     = lookup_kernel_symbol("__ZN12KLDBootstrap20readBooterExtensionsEv");
+	int arch     = determineKernelArchitecture(kernelData);
+    bool is64bit = (arch == KERNEL_64);
+ 
     symbolList_t* readPrelinkedExtensions  = is64bit ?
 												lookup_kernel_symbol("__ZN12KLDBootstrap23readPrelinkedExtensionsEP10section_64") :
 												lookup_kernel_symbol("__ZN12KLDBootstrap23readPrelinkedExtensionsEP7section");     // 32bit
@@ -42,39 +37,28 @@ void patch_readStartupExtensions(void* kernelData)
 		return;
     }
 	
-    symbolList_t* OSKextLog  = lookup_kernel_symbol("_OSKextLog");
+    symbolList_t* getsegbyname         = lookup_kernel_symbol("_getsegbyname");
+    symbolList_t* readBooterExtensions = lookup_kernel_symbol("__ZN12KLDBootstrap20readBooterExtensionsEv");
+    symbolList_t* OSKextLog            = lookup_kernel_symbol("_OSKextLog");
     
     section_t* __KLD = lookup_section("__KLD","__text");
-    //section_t* __TEXT = lookup_section("__KLD","__text");
-
     
     
 	UInt32 readBooterExtensionsLocation     = readBooterExtensions    ? readBooterExtensions->addr    - __KLD->address + __KLD->offset: 0; 
 	UInt32 readPrelinkedExtensionsLocation  = readPrelinkedExtensions ? readPrelinkedExtensions->addr - __KLD->address + __KLD->offset : 0; 
 	UInt32 OSKextLogLocation                = OSKextLog               ? OSKextLog->addr               - __KLD->address + __KLD->offset : 0; 
-	UInt32 getsegbynameLocation             = getsegbyname            ? getsegbyname->addr            - __KLD->address + __KLD->offset : 0; 
+	UInt32 getsegbynameLocation             = getsegbyname            ? getsegbyname->addr            - __KLD->address + __KLD->offset : 0;
     
-    
-    // bootstrap_patcher.c
-	//register_kernel_symbol(KERNEL_ANY, "__ZN12KLDBootstrap20readBooterExtensionsEv");
-    //register_kernel_symbol(KERNEL_ANY, "__ZN12KLDBootstrap23readPrelinkedExtensionsEP10section");    //32bit kernel
-    //register_kernel_symbol(KERNEL_ANY, "__ZN12KLDBootstrap23readPrelinkedExtensionsEP10section_64"); //64bit kernel
-	//register_kernel_symbol(KERNEL_ANY, "_OSKextLog");
+    UInt32 patchLocation = readPrelinkedExtensionsLocation;
 
-    
-    // Step 1: Locate the First _OSKextLog call inside of __ZN12KLDBootstrap23readPrelinkedExtensionsEP10section
-    UInt32 patchLocation = readPrelinkedExtensionsLocation - (UInt32)kernelData;
-    OSKextLogLocation -= (UInt32)kernelData;
+    patchLocation                -= (UInt32)kernelData;
+    OSKextLogLocation            -= (UInt32)kernelData;
     readBooterExtensionsLocation -= (UInt32)kernelData;
-	getsegbynameLocation -= (UInt32)kernelData;
-    //printf("Starting at 0x%X\n", readPrelinkedExtensions->addr - (UInt32)kernelData + __KLD->offset - __KLD->address);
-    //printf("Starting at 0x%X\n", patchLocation + __KLD->address - __KLD->offset); 
-    //printf("Starting at 0x%X\n", __KLD->address - __KLD->offset); 
+	getsegbynameLocation         -= (UInt32)kernelData;
 
-
-    
+    // Step 1: Locate the first getsegbyname() call inside of __ZN12KLDBootstrap23readPrelinkedExtensionsEP10section
 	while(  
-		  (bytes[patchLocation -1] != 0xE8) ||
+		  (bytes[patchLocation -1] != 0xE8) || /* Call */
 		  ( ( (UInt32)(getsegbynameLocation - patchLocation  - 4) ) != (UInt32)((bytes[patchLocation + 0] << 0  | 
                                                                                             bytes[patchLocation + 1] << 8  | 
                                                                                             bytes[patchLocation + 2] << 16 |
@@ -86,9 +70,9 @@ void patch_readStartupExtensions(void* kernelData)
     patchLocation++;
 
     
-    // Second one...
+    // Second getsegbyname() call...
     while(  
-		  (bytes[patchLocation -1] != 0xE8) ||
+		  (bytes[patchLocation -1] != 0xE8) || /* Call */
 		  ( ( (UInt32)(getsegbynameLocation - patchLocation  - 4) ) != (UInt32)((bytes[patchLocation + 0] << 0  | 
                                                                                  bytes[patchLocation + 1] << 8  | 
                                                                                  bytes[patchLocation + 2] << 16 |
@@ -99,11 +83,9 @@ void patch_readStartupExtensions(void* kernelData)
 	}
     patchLocation++;
 
-
-    //printf("patchLocation at 0x%X\n", patchLocation - __KLD->offset + __KLD->address); 
-
-    while(  
-		  (bytes[patchLocation -1] != 0xE8) ||
+    // First OSKextLog() call after two getsegbyname calls
+    while(
+		  (bytes[patchLocation -1] != 0xE8) || /* Call */
 		  ( ( (UInt32)(OSKextLogLocation - patchLocation  - 4) ) != (UInt32)((bytes[patchLocation + 0] << 0  | 
                                                                                  bytes[patchLocation + 1] << 8  | 
                                                                                  bytes[patchLocation + 2] << 16 |
@@ -112,10 +94,11 @@ void patch_readStartupExtensions(void* kernelData)
 	{
 		patchLocation--;
 	}
+    
    //printf("patchLocation at 0x%X\n", patchLocation - __KLD->offset + __KLD->address); 
 
     
-    // Step 2: remove the _OSKextLog call, this call takes the form:
+    // Step 2: remove the _OSKextLog call, this call takes the form (32bit):
     // 00886a73	movl	$0x00887508,0x08(%esp)
     // 00886a7b	movl	$0x00010084,0x04(%esp)
     // 00886a83	movl	$0x00000000,(%esp)
@@ -137,9 +120,7 @@ void patch_readStartupExtensions(void* kernelData)
         for(i = 0; i < 0x15; i++) bytes[++patchLocation] = 0x90;
     
     }
-    
-    
-    
+
     // Step 3: Add a call to __ZN12KLDBootstrap21readStartupExtensionsEv.
     // This takes the form of
     // 00886ea6	movl	%esi,(%esp)
@@ -162,7 +143,7 @@ void patch_readStartupExtensions(void* kernelData)
 		bytes[++patchLocation] = 0xdf;		
 	}
 	++patchLocation;	// 0xe8 -> call
-    UInt32 rel = patchLocation+5;
+    UInt32 rel = patchLocation+5; /* Update relative address */
     bytes[++patchLocation] = (readBooterExtensionsLocation - rel) >> 0;
     bytes[++patchLocation] = (readBooterExtensionsLocation - rel) >> 8;
     bytes[++patchLocation] = (readBooterExtensionsLocation - rel) >> 16;
@@ -171,5 +152,3 @@ void patch_readStartupExtensions(void* kernelData)
 	printf(HEADER "KLDBootstrap::readBooterExtensions() call injected into KLDBootstrap::readPrelinkedExtensions(void* section%s)\n", is64bit ? "_64" : "");
 
 }
-
-//UInt32 locatNthCall(const char*
