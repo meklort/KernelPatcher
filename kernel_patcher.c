@@ -1,6 +1,10 @@
 /*
  * Copyright (c) 2009-2011 Evan Lojewski. All rights reserved.
  *
+ *
+ * This work is licensed under the
+ *  Creative Commons Attribution-NonCommercial 3.0 Unported License.
+ *  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/.
  */
 
 #include "libsaio.h"
@@ -83,8 +87,13 @@ void KernelPatcher_start()
     register_kernel_patch(patch_pmKextRegister,        KERNEL_ANY, CPUID_MODEL_ANY);
     //register_kernel_patch(patch_pmCPUExitHaltToOff,        KERNEL_ANY, CPUID_MODEL_ANY);
 
+    register_kernel_patch(patch_kexts,        KERNEL_ANY, CPUID_MODEL_ANY);
+
+    
     register_section("__KLD", "__text");
     register_section("__TEXT","__text");
+    register_section("__PRELINK_TEXT","__text");
+    register_section("__PRELINK_INFO","__info");
     
 	register_hook_callback("DecodeKernel", &patch_kernel); 
     register_hook_callback("DecodedKernel", &loadKernelPatcherKexts);
@@ -346,7 +355,6 @@ void load64KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
 
 
 
-
 void loadKernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3, void *arg4)
 
 {
@@ -597,7 +605,7 @@ inline int locate_symbols(void* kernelData)
 }
 
 void section_handler(char* section, char* segment, void* cmd, UInt64 offset, UInt64 address)
-{	
+{
 //    printf("segment: %s,%s\t\toffset: 0x%lX, 0x%lX\n", segment, section, address, offset);
     //    printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, address, offset);
     //    printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, offset, address);
@@ -625,7 +633,7 @@ void section_handler(char* section, char* segment, void* cmd, UInt64 offset, UIn
             kextSections = first;
             kextSections->data.section_64 = fileSection;
 			kextSections->is64 = true;
-        } 
+        }
     }
 
     // Locate the section in the list, if it exists, update it's address

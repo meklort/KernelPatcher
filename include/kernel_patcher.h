@@ -80,6 +80,7 @@ void patch_lapic_init(void* kernelData);
 void patch_commpage_stuff_routine(void* kernelData);
 void patch_lapic_configure(void* kernelData);
 void patch_lapic_interrupt(void* kernelData);
+void patch_kexts(void* kernelData);
 
 void patch_readStartupExtensions(void* kernelData);
 
