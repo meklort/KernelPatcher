@@ -21,6 +21,7 @@
 void handle_kext_entry(void* kernelData, TagPtr kextEntry)
 {
     static section_t* txt;
+    
     if(!txt) txt = lookup_section("__PRELINK_TEXT","__text");
     if(!txt) return;
     
@@ -37,29 +38,20 @@ void handle_kext_entry(void* kernelData, TagPtr kextEntry)
         
         const char* kextName = XMLCastString(XMLGetProperty(kextEntry, "CFBundleExecutable"));
         
-        //const char* kextPath = XMLCastString(XMLGetProperty(kextEntry, "_PrelinkBundlePath"));
-        //unsigned int kextFinalAddress = XMLCastInteger(XMLGetProperty(kextEntry, "_PrelinkExecutableLoadAddr"));
-
-        //printf("txt address 0x%0.8X offset 0x%0.8X\n", kextStart, kextOffset);
-        //printf("Found kext %s (%s) %d bytes at 0x%0.8X\n", kextName, kextPath, kextSize, kextBinAddress);
-        
-        //printf("Found kext %s (%s) %d bytes at PRELINK_KEXT offset 0x%0.8X\n", kextName, kextPath, kextSize, kextBinAddress);
-        
-        // Notify the kext patcher that a kext has been located.
-        //UInt8 kextOrigSize = kextSize;
         execute_hook("LoadMatchedModules", (void*)kextName, &kextSize, &kernel[kextBinAddress], NULL);
-        
         // Todo: verify updated kext does not overwrite next kext.
-
     }
 }
 
 void patch_kexts(void* kernelData)
 {
+    TagPtr prelinkInfo = NULL;
     UInt8* bytes = (UInt8*)kernelData;
 
 	section_t* txt = lookup_section("__PRELINK_TEXT","__text");
     section_t* info = lookup_section("__PRELINK_INFO","__info");
+
+    UInt32 prelinked_info = info->offset; // location of plist in file
 
 	if(!txt)
 	{
@@ -73,12 +65,6 @@ void patch_kexts(void* kernelData)
 		return;
 	}
     
-    //UInt32 prelinked_text = txt->offset; // locaiton of txt in file
-    UInt32 prelinked_info = info->offset; // location of plist in file
-    //printf("Info at 0x%0.8X\n", prelinked_info);
-    //printf("Kexts at 0x%0.8X\n", prelinked_text);
-    
-    TagPtr prelinkInfo = NULL;
     XMLParseFile((char*)&bytes[prelinked_info], &prelinkInfo);
     if(prelinkInfo)
     {
