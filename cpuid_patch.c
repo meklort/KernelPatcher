@@ -119,6 +119,7 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
     // replace cpuid
 #if 0
     UInt32 actual_addr = get_cpuid_family_addr_64(kernelData) + 1;
+    printf("cpuid familt add is 0x%0.4X\n", actual_addr);
     if(actual_addr != 1 && impersonateModel && impersonateFamily)
     {
         /*
@@ -490,6 +491,7 @@ UInt32 get_cpuid_cpu_info_addr_64(void* kernelData)
     
     
 	UInt32 functionStart = symbol ? symbol->addr - txt->address + txt->offset : 0;
+    //printf("Located functionStart at 0x%0.4X\n", functionStart);
     
     functionStart +=6; // movl	0x00872d24,%edx instruction, 0x00872d24 is a pointer
     if(*(UInt8*)functionStart == 0xa1) functionStart++; // move eax
