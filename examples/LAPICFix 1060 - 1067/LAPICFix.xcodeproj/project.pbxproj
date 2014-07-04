@@ -1,0 +1,292 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		20192F2313CA83D000B67CBA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 20192F2113CA83D000B67CBA /* InfoPlist.strings */; };
+		20192F2613CA83D000B67CBA /* LAPICFix.c in Sources */ = {isa = PBXBuildFile; fileRef = 20192F2513CA83D000B67CBA /* LAPICFix.c */; };
+		20192F2D13CA83F200B67CBA /* lapic.h in Headers */ = {isa = PBXBuildFile; fileRef = 20192F2C13CA83F200B67CBA /* lapic.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		20192F1913CA83D000B67CBA /* LAPICFix.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LAPICFix.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		20192F1D13CA83D000B67CBA /* Kernel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kernel.framework; path = System/Library/Frameworks/Kernel.framework; sourceTree = SDKROOT; };
+		20192F2013CA83D000B67CBA /* LAPICFix-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "LAPICFix-Info.plist"; sourceTree = "<group>"; };
+		20192F2213CA83D000B67CBA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		20192F2413CA83D000B67CBA /* LAPICFix-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LAPICFix-Prefix.pch"; sourceTree = "<group>"; };
+		20192F2513CA83D000B67CBA /* LAPICFix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = LAPICFix.c; sourceTree = "<group>"; };
+		20192F2C13CA83F200B67CBA /* lapic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lapic.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		20192F1413CA83D000B67CBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		20192F0C13CA83D000B67CBA = {
+			isa = PBXGroup;
+			children = (
+				20192F1E13CA83D000B67CBA /* LAPICFix */,
+				20192F1B13CA83D000B67CBA /* Frameworks */,
+				20192F1A13CA83D000B67CBA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		20192F1A13CA83D000B67CBA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				20192F1913CA83D000B67CBA /* LAPICFix.kext */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		20192F1B13CA83D000B67CBA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				20192F1C13CA83D000B67CBA /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		20192F1C13CA83D000B67CBA /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				20192F1D13CA83D000B67CBA /* Kernel.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		20192F1E13CA83D000B67CBA /* LAPICFix */ = {
+			isa = PBXGroup;
+			children = (
+				20192F2C13CA83F200B67CBA /* lapic.h */,
+				20192F2513CA83D000B67CBA /* LAPICFix.c */,
+				20192F1F13CA83D000B67CBA /* Supporting Files */,
+			);
+			path = LAPICFix;
+			sourceTree = "<group>";
+		};
+		20192F1F13CA83D000B67CBA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				20192F2013CA83D000B67CBA /* LAPICFix-Info.plist */,
+				20192F2113CA83D000B67CBA /* InfoPlist.strings */,
+				20192F2413CA83D000B67CBA /* LAPICFix-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		20192F1513CA83D000B67CBA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				20192F2D13CA83F200B67CBA /* lapic.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		20192F1813CA83D000B67CBA /* LAPICFix */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 20192F2913CA83D000B67CBA /* Build configuration list for PBXNativeTarget "LAPICFix" */;
+			buildPhases = (
+				20192F1313CA83D000B67CBA /* Sources */,
+				20192F1413CA83D000B67CBA /* Frameworks */,
+				20192F1513CA83D000B67CBA /* Headers */,
+				20192F1613CA83D000B67CBA /* Resources */,
+				20192F1713CA83D000B67CBA /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LAPICFix;
+			productName = LAPICFix;
+			productReference = 20192F1913CA83D000B67CBA /* LAPICFix.kext */;
+			productType = "com.apple.product-type.kernel-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		20192F0E13CA83D000B67CBA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 20192F1113CA83D000B67CBA /* Build configuration list for PBXProject "LAPICFix" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 20192F0C13CA83D000B67CBA;
+			productRefGroup = 20192F1A13CA83D000B67CBA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				20192F1813CA83D000B67CBA /* LAPICFix */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		20192F1613CA83D000B67CBA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				20192F2313CA83D000B67CBA /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		20192F1713CA83D000B67CBA /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		20192F1313CA83D000B67CBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				20192F2613CA83D000B67CBA /* LAPICFix.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		20192F2113CA83D000B67CBA /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				20192F2213CA83D000B67CBA /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		20192F2713CA83D000B67CBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		20192F2813CA83D000B67CBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		20192F2A13CA83D000B67CBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "LAPICFix/LAPICFix-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				INFOPLIST_FILE = "LAPICFix/LAPICFix-Info.plist";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				MODULE_NAME = com.meklort.LAPICFix;
+				MODULE_START = LAPICFix_start;
+				MODULE_STOP = LAPICFix_stop;
+				MODULE_VERSION = 1.0.0d1;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.7;
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Debug;
+		};
+		20192F2B13CA83D000B67CBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "LAPICFix/LAPICFix-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				INFOPLIST_FILE = "LAPICFix/LAPICFix-Info.plist";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				MODULE_NAME = com.meklort.LAPICFix;
+				MODULE_START = LAPICFix_start;
+				MODULE_STOP = LAPICFix_stop;
+				MODULE_VERSION = 1.0.0d1;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.7;
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		20192F1113CA83D000B67CBA /* Build configuration list for PBXProject "LAPICFix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20192F2713CA83D000B67CBA /* Debug */,
+				20192F2813CA83D000B67CBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		20192F2913CA83D000B67CBA /* Build configuration list for PBXNativeTarget "LAPICFix" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				20192F2A13CA83D000B67CBA /* Debug */,
+				20192F2B13CA83D000B67CBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 20192F0E13CA83D000B67CBA /* Project object */;
+}
