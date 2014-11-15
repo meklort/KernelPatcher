@@ -15,8 +15,8 @@
 
 #include "modules.h"
 #include "cpu.h"
-#define CPUID_MODEL_ANY		0x00
-#define CPUID_MODEL_UNKNOWN	0x01
+#define CPU_MODEL_ANY		0x00
+#define CPU_MODEL_UNKNOWN	0x01
 
 
 #define KERNEL_ANY	0x00
