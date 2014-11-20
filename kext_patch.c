@@ -10,7 +10,7 @@
 #include "kernel_patcher.h"
 #include "modules.h"
 #include "libsaio.h"
-#include <xml.h>
+#include <libsaio/xml.h>
 #include <stdio.h>
 
 #define STRINGIFY(x) #x

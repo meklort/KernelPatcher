@@ -11,7 +11,7 @@
 #include "kernel_patcher.h"
 #include <libsaio/platform.h>
 #include "modules.h"
-#include "xml.h"
+#include <libsaio/xml.h>
 #include "sl.h"
 #include <libsaio/bootstruct.h>
 
