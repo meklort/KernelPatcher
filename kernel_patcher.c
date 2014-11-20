@@ -9,11 +9,11 @@
 
 #include "libsaio.h"
 #include "kernel_patcher.h"
-#include "platform.h"
+#include <libsaio/platform.h>
 #include "modules.h"
 #include "xml.h"
 #include "sl.h"
-#include "bootstruct.h"
+#include <libsaio/bootstruct.h>
 
 #define DBG     printf
 //fixme ^^^

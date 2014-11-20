@@ -9,7 +9,7 @@
 
 #include "kernel_patcher.h"
 #include "libsaio.h"
-#include "platform.h"
+#include <libsaio/platform.h>
 #include "modules.h"
 
 
