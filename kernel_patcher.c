@@ -86,6 +86,8 @@ void KernelPatcher_start()
     
     register_kernel_patch(patch_pmKextRegister,        KERNEL_ANY, CPU_MODEL_ANY);
     //register_kernel_patch(patch_pmCPUExitHaltToOff,        KERNEL_ANY, CPU_MODEL_ANY);
+    
+    register_kernel_patch(patch_xcpm_msr, KERNEL_ANY, CPU_MODEL_ANY);
 
     register_kernel_patch(patch_kexts,        KERNEL_ANY, CPU_MODEL_ANY);
 
@@ -94,6 +96,7 @@ void KernelPatcher_start()
     register_section("__TEXT","__text");
     register_section("__PRELINK_TEXT","__text");
     register_section("__PRELINK_INFO","__info");
+    register_section("__DATA","__data");
     
 	register_hook_callback("DecodeKernel", &patch_kernel); 
     register_hook_callback("DecodedKernel", &loadKernelPatcherKexts);
@@ -559,9 +562,8 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
 		   version_major ? *version_major : 0, 
 		   version_minor ? *version_minor : 0, 
 		   version_rev   ? *version_rev : 0, version_str);
-    pause();
 
-	patchRoutine_t* kernelPatch = patches;
+    patchRoutine_t* kernelPatch = patches;
     while(kernelPatch)
     {
         if(kernelPatch->validArchs == KERNEL_ANY || arch == kernelPatch->validArchs)

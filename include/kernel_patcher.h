@@ -82,6 +82,8 @@ void patch_lapic_configure(void* kernelData);
 void patch_lapic_interrupt(void* kernelData);
 void patch_kexts(void* kernelData);
 
+void patch_xcpm_msr(void* kernelData);
+
 void patch_readStartupExtensions(void* kernelData);
 
 #endif /* !__BOOT2_KERNEL_PATCHER_H */

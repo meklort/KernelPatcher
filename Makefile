@@ -8,9 +8,9 @@ MODULE_DEPENDENCIES = Chameleon
 
 DIR = KernelPatcher
 
-MODULE_OBJS   = kernel_patcher.x86.mach.o commpage_patch.x86.mach.o cpuid_patch.x86.mach.o lapic_patch.x86.mach.o power_managment_patch.x86.mach.o bootstrap_patch.x86.mach.o kext_patch.x86.mach.o
+MODULE_OBJS   = kernel_patcher.x86.mach.o commpage_patch.x86.mach.o cpuid_patch.x86.mach.o lapic_patch.x86.mach.o power_managment_patch.x86.mach.o bootstrap_patch.x86.mach.o kext_patch.x86.mach.o xcpm_patch.x86.mach.o
 
-PATCHER_OBJS := main.o kernel_patcher.o commpage_patch.o cpuid_patch.o lapic_patch.o power_managment_patch.o bootstrap_patch.o kext_patch.o
+PATCHER_OBJS := main.o kernel_patcher.o commpage_patch.o cpuid_patch.o lapic_patch.o power_managment_patch.o bootstrap_patch.o kext_patch.o xcpm_patch.o
 
 ifeq (${MAKECMDGOALS},xnu_patcher)
 override CONFIG_COVERAGE=n
