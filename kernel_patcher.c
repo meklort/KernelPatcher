@@ -31,7 +31,7 @@
 void* preDecodedKernAddr = NULL;
 void loadKernelPatcherKexts(void* kernelBinary, void* arg2, void* arg3, void *arg4);
 
-void section_handler(char* section, char* segment, void* cmd, UInt64 offset, UInt64 address);
+void section_handler(char* base, char* new_base, char* section, char* segment, void* cmd, UInt64 offset, UInt64 address);
 
 extern symbolList_t* moduleSymbols;
 extern PlatformInfo_t    Platform;
@@ -102,7 +102,7 @@ void KernelPatcher_start()
 /*
  * Load KPKexts
  */
-long long add_symbol_kmod(char* symbol, long long addr, char is64)
+void add_symbol_kmod(char* symbol, long long addr, char is64)
 {
     symbolList_t* entry;
     symbolList_t* last = moduleSymbols;
@@ -117,8 +117,6 @@ long long add_symbol_kmod(char* symbol, long long addr, char is64)
     // add symbol to end of list
     if(last == NULL) moduleSymbols = entry; 
     else             last->next = entry;
-
-    return UNKNOWN_ADDRESS;
 }
 
 void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3, void *arg4)
@@ -206,7 +204,7 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
                                         
                                         moduleSymbols = NULL;
                                         kextSections = NULL;
-                                        parse_mach((void*)kextBase, NULL, &add_symbol_kmod, &section_handler);
+                                        parse_mach((void*)kextBase, NULL, NULL, &add_symbol_kmod, &section_handler);
                                         kextSymbols = moduleSymbols;
                                         
                                         while(kextSections)
@@ -591,18 +589,18 @@ int determineKernelArchitecture(void* kernelData)
  **/
 inline int locate_symbols(void* kernelData)
 {
-	parse_mach(kernelData, NULL, &add_symbol, &section_handler);
+	parse_mach(kernelData, NULL, NULL, &add_symbol, &section_handler);
 	return 1;
 }
 
-void section_handler(char* section, char* segment, void* cmd, UInt64 offset, UInt64 address)
+void section_handler(char* base, char* new_base, char* section, char* segment, void* cmd, UInt64 offset, UInt64 address)
 {
 //    printf("segment: %s,%s\t\toffset: 0x%lX, 0x%lX\n", segment, section, address, offset);
     //    printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, address, offset);
     //    printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, offset, address);
     
     if(archCpuType == CPU_TYPE_I386)
-    {
+    {	
         struct section* fileSection = (void*)(UInt32)cmd;
         if(fileSection->nreloc)
         {
