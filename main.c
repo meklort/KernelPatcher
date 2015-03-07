@@ -25,7 +25,7 @@ enum NXByteOrder {
 };
 
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <mach-o/fat.h>
@@ -35,7 +35,6 @@ enum NXByteOrder {
 #include "include/kernel_patcher.h"
 #include "../../boot2/modules.h"
 #include "../../boot2/boot.h"
-#include "../../libsaio/platform.h"
 
 // Internal functions
 int show_help(int argc, const char * argv[]);
@@ -54,7 +53,6 @@ void KernelPatcher_start();
 PlatformInfo_t    Platform;
 extern section_t* kernelSections;
 extern symbolList_t*   kernelSymbols;
-extern symbolList_t*   moduleSymbols;
 
 int main (int argc, const char * argv[])
 {
@@ -81,7 +79,7 @@ int main (int argc, const char * argv[])
     
     
     // Populate with platform information used in the modules
-    Platform.CPU.Model = CPUID_MODEL_ATOM;
+//    Platform.CPU.Model = CPUID_MODEL_ATOM;
     
     
     // Determine size of the kernel
@@ -93,7 +91,7 @@ int main (int argc, const char * argv[])
     
     
     // read in file
-    kernel_data = malloc(kernel_size);
+    kernel_data = (char*)malloc(kernel_size);
     
     if(fread(kernel_data, sizeof(char), kernel_size, kernel) == kernel_size)
     {
@@ -126,7 +124,7 @@ int main (int argc, const char * argv[])
 			DecodeKernel_patcher(kernel_data);
 		}
 		
-		char* outputFile = malloc(strlen(argv[1]) + sizeof(".patched"));
+		char* outputFile = (char*)malloc(strlen(argv[1]) + sizeof(".patched"));
 		sprintf(outputFile, "%s.patched", argv[1]);
 		FILE* outFile = fopen(outputFile, "w");
 		if(outFile)
@@ -166,7 +164,7 @@ void * safe_malloc(size_t size, const char *file, int line)
 #if 0
     printf("[%s:%d] Allocateing %d bytes\n", file, line, size);
 #endif
-    return malloc(size);
+    return (void*)malloc(size);
 }
 
 int verbose(const char *format, ...)
@@ -326,7 +324,7 @@ DecodeKernel_patcher(void *binary)
 			return -1;
 #endif
 		uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
-		binary = buffer = malloc(uncompressed_size);
+		binary = buffer = (char*)malloc(uncompressed_size);
 		
 		size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
 							   OSSwapBigToHostInt32(kernel_header->compressed_size));

@@ -33,7 +33,7 @@ void loadKernelPatcherKexts(void* kernelBinary, void* arg2, void* arg3, void *ar
 
 void section_handler(char* base, char* new_base, char* section, char* segment, void* cmd, UInt64 offset, UInt64 address);
 
-extern symbolList_t* moduleSymbols;
+extern symbolList_t* gModuleSymbols;
 extern PlatformInfo_t    Platform;
 
 patchRoutine_t* patches = NULL;
@@ -48,7 +48,7 @@ symbolList_t*   kernelSymbols = NULL;
  */
 symbolList_t* lookup_symbol_id(UInt32 index)
 {
-	symbolList_t* entry = moduleSymbols;
+	symbolList_t* entry = gModuleSymbols;
     while(index && entry)
     {
         entry = entry->next;
@@ -104,8 +104,9 @@ void KernelPatcher_start()
  */
 void add_symbol_kmod(char* symbol, long long addr, char is64)
 {
+    printf("Adding symbol %s at addr 0x%X\n", symbol, addr);
     symbolList_t* entry;
-    symbolList_t* last = moduleSymbols;
+    symbolList_t* last = gModuleSymbols;
     
     entry = malloc(sizeof(symbolList_t));
 	entry->addr = (UInt32)addr;
@@ -115,7 +116,7 @@ void add_symbol_kmod(char* symbol, long long addr, char is64)
     while(last && last->next) last = last->next;
     
     // add symbol to end of list
-    if(last == NULL) moduleSymbols = entry; 
+    if(last == NULL) gModuleSymbols = entry; 
     else             last->next = entry;
 }
 
@@ -200,12 +201,12 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
                                         bootArgs->ksize = kextBase - bootArgs->kaddr + kextSize;
                                         bcopy(binary, (void*)kextBase, kextSize); // copy kext into allocated mem
                                         
-                                        symbolList_t* oldSymbols = moduleSymbols;
+                                        symbolList_t* oldSymbols = gModuleSymbols;
                                         
-                                        moduleSymbols = NULL;
+                                        gModuleSymbols = NULL;
                                         kextSections = NULL;
                                         parse_mach((void*)kextBase, NULL, NULL, &add_symbol_kmod, &section_handler);
-                                        kextSymbols = moduleSymbols;
+                                        kextSymbols = gModuleSymbols;
                                         
                                         while(kextSections)
                                         {  
@@ -220,9 +221,9 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
                                                 symbolList_t* sym = lookup_symbol_id(relinfo->r_symbolnum);
                                                 if(sym)
                                                 {                                                       
-                                                    moduleSymbols = kernelSymbols;
+                                                    gModuleSymbols = kernelSymbols;
                                                     UInt32 symAddr = lookup_all_symbols(sym->symbol);
-                                                    moduleSymbols = kextSymbols;
+                                                    gModuleSymbols = kextSymbols;
                                                     
                                                     if(symAddr != (UInt32)UNKNOWN_ADDRESS)
                                                     {
@@ -257,7 +258,7 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
                                             kextSections = kextSections->next;
                                         }
                                         // restore symbols
-                                        moduleSymbols = oldSymbols;                                        
+                                        gModuleSymbols = oldSymbols;                                        
                                     }
                                     else
                                     {
@@ -286,15 +287,15 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
                             const char* newFunction = XMLCastString(XMLGetProperty(allSymbols, oldFunction));
 							
                             // TODO: fix for 64bit
-                            symbolList_t* oldSymbols = moduleSymbols;
+                            symbolList_t* oldSymbols = gModuleSymbols;
 							
-                            moduleSymbols = kextSymbols;
+                            gModuleSymbols = kextSymbols;
                             long long newaddr = lookup_all_symbols(newFunction);
 							
-                            moduleSymbols = kernelSymbols;
+                            gModuleSymbols = kernelSymbols;
                             long long origaddr = lookup_all_symbols(oldFunction);
                             
-                            moduleSymbols = oldSymbols;
+                            gModuleSymbols = oldSymbols;
                             
                             if(origaddr != UNKNOWN_ADDRESS && newaddr != UNKNOWN_ADDRESS)
                             {
@@ -520,13 +521,13 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
 	
     preDecodedKernAddr = kernelData;
 	
-    // Use the symbol handler from the module system. This requires us to backup the moduleSymbols variable and restore it once complete
-    symbolList_t* origmoduleSymbols = moduleSymbols;
+    // Use the symbol handler from the module system. This requires us to backup the gModuleSymbols variable and restore it once complete
+    symbolList_t* origmoduleSymbols = gModuleSymbols;
     
     
-    moduleSymbols = NULL;
+    gModuleSymbols = NULL;
     locate_symbols(kernelData);
-    kernelSymbols = moduleSymbols;    // save symbols for future use, if needed
+    kernelSymbols = gModuleSymbols;    // save symbols for future use, if needed
     
 	section_t* txt = lookup_section("__TEXT","__text");
 	if(!txt)
@@ -545,19 +546,20 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
     UInt32* version_major = (UInt32*)(UInt32)(ver_major ? ver_major->addr - txt->address + txt->offset: 0);
     UInt32* version_minor = (UInt32*)(UInt32)(ver_minor ? ver_minor->addr - txt->address + txt->offset: 0);
     UInt32* version_rev   = (UInt32*)(UInt32)(ver_rev   ? ver_rev->addr   - txt->address + txt->offset: 0);
-	char*   version_str      = (void*)(UInt32)(version   ? version->addr   - txt->address + txt->offset: 0);
-	char* start = 0;
+    char*   version_str      = (void*)(UInt32)(version   ? version->addr   - txt->address + txt->offset: 0);
+    char* start = 0;
 	
-	if(version_str && (start = strstr(version_str,   "root:xnu")))
-	{
-		memcpy(start, "*patched", strlen("*patched"));
-	}
+    if(version_str && (start = strstr(version_str,   "root:xnu")))
+    {
+        memcpy(start, "*patched", strlen("*patched"));
+    }
+
     verbose(HEADER "Patching %dbit XNU Kernel %d.%d.%d\n%s\n", 
 		   arch == KERNEL_32 ? 32 : 64, 
 		   version_major ? *version_major : 0, 
 		   version_minor ? *version_minor : 0, 
 		   version_rev   ? *version_rev : 0, version_str);
-    
+    pause();
 
 	patchRoutine_t* kernelPatch = patches;
     while(kernelPatch)
@@ -573,7 +575,7 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
     execute_hook("Kernel Patched", (void*)kernelData, (void*)kernelSymbols, (void*)arch, NULL);
     
     
-    moduleSymbols = origmoduleSymbols; // restore orig pointer;
+    gModuleSymbols = origmoduleSymbols; // restore orig pointer;
 }
 
 int determineKernelArchitecture(void* kernelData)
@@ -595,10 +597,10 @@ inline int locate_symbols(void* kernelData)
 
 void section_handler(char* base, char* new_base, char* section, char* segment, void* cmd, UInt64 offset, UInt64 address)
 {
-//    printf("segment: %s,%s\t\toffset: 0x%lX, 0x%lX\n", segment, section, address, offset);
-    //    printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, address, offset);
-    //    printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, offset, address);
-    
+    //printf("segment: %s,%s\t\toffset: 0x%lX, 0x%lX\n", segment, section, address, offset);
+    //printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, address, offset);
+    //printf("segment: %s,%s offset: 0x%X, 0x%X\n", segment, section, offset, address);
+    offset += (int)base;
     if(archCpuType == CPU_TYPE_I386)
     {	
         struct section* fileSection = (void*)(UInt32)cmd;
@@ -628,7 +630,7 @@ void section_handler(char* base, char* new_base, char* section, char* segment, v
     // Locate the section in the list, if it exists, update it's address
 	section_t *kernelSection = lookup_section(segment, section);
 	
-	if(kernelSection)
+    if(kernelSection)
     {
         //printf("%s,%s located at 0x%lX\n", kernelSection->segment, kernelSection->section, kernelSection->address - kernelSection->offset);
         //printf("%s,%s located at 0x%X\n", kernelSection->segment, kernelSection->section, address - offset);
