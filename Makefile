@@ -12,11 +12,13 @@ MODULE_OBJS   = kernel_patcher.x86.mach.o commpage_patch.x86.mach.o cpuid_patch.
 
 PATCHER_OBJS := main.o kernel_patcher.o commpage_patch.o cpuid_patch.o lapic_patch.o power_managment_patch.o bootstrap_patch.o kext_patch.o
 
+ifeq (${MAKECMDGOALS},xnu_patcher)
+override CONFIG_COVERAGE=n
+endif
 
 include ../MakeInc.dir
 
 ifeq (${MAKECMDGOALS},xnu_patcher)
-override CONFIG_COVERAGE=n
 CFLAGS += -m32 -D__LITTLE_ENDIAN__ -Wno-multichar -Wno-int-to-pointer-cast
 endif
 
