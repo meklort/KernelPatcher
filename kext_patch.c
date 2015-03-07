@@ -85,10 +85,11 @@ void patch_kexts(void* kernelData)
                     if(XMLCastArray(info))
                     {
                         int numkexts = XMLTagCount(info);
-                        
+                        int j;
+
                         verbose(HEADER "Notifying KextPatcher of %d potential kexts.\n", numkexts);
 
-                        for(int j = 0; j < numkexts; j++)
+                        for(j = 0; j < numkexts; j++)
                         {
                             TagPtr kextEntry = XMLGetElement(info, j);
                             if(XMLCastDict(kextEntry))
