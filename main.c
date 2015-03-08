@@ -44,6 +44,7 @@ static unsigned long Adler32( unsigned char * buffer, long length );
 // Variables reveferenced by chameleon objects or by the patcher
 boot_args *bootArgs;
 cpu_type_t archCpuType=CPU_TYPE_X86_64;
+struct multiboot_info *gMI = NULL;
 
 // external functions not in a header file.
 extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
