@@ -591,7 +591,7 @@ int determineKernelArchitecture(void* kernelData)
 /**
  **		This functions located the requested symbols and segments in the mach-o file
  **/
-inline int locate_symbols(void* kernelData)
+int locate_symbols(void* kernelData)
 {
 	parse_mach(kernelData, NULL, NULL, &add_symbol, &section_handler);
 	return 1;
