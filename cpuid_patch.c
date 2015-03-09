@@ -9,7 +9,7 @@
 
 #include "kernel_patcher.h"
 #include "libsaio.h"
-#include <libsaio/platform.h>
+#include <../trunk/i386/libsaio/platform.h>
 #include "modules.h"
 
 
@@ -30,16 +30,16 @@ void patch_cpuid_set_info_all(void* kernelData)
 {
 	switch(Platform.CPU.Model)
 	{
-		case CPU_MODEL_ATOM:
+		case CPUID_MODEL_ATOM:
 			if(determineKernelArchitecture(kernelData) == KERNEL_32)
 			{
                 msglog(HEADER "Attempting to patch 32bit kernel for Atom cpu\n");
-				patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_PENRYN, CPU_MODEL_PENRYN);
+				patch_cpuid_set_info_32(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN);
 			}
 			else 
 			{
                 msglog(HEADER "Attempting to patch 64bit kernel for Atom cpu\n");
-				patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_PENRYN, CPU_MODEL_PENRYN); 
+				patch_cpuid_set_info_64(kernelData, CPUFAMILY_INTEL_PENRYN, CPUID_MODEL_PENRYN); 
                 
 			}
             

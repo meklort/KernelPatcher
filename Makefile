@@ -32,3 +32,7 @@ xnu_patcher: 	${OBJROOT} $(addprefix $(OBJROOT)/, $(PATCHER_OBJS)) $(OBJROOT)/..
 	${PRINT}$(CC) -m32 $(filter %.o,$^) -o $@
 	@rm $(OBJROOT)/main.o
 
+
+override INC = -I$(SRCROOT)/i386/modules/include/ -I${abspath include/} -I../Chameleon/trunk/i386/libsaio/ -I../Chameleon/trunk/i386/libsa/ \
+        -I../Chameleon/trunk/i386/include/ -I${SRCROOT}/i386/boot2/ $(MODULE_INCLUDES)
+

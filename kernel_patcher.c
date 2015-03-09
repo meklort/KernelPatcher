@@ -73,23 +73,23 @@ sectionList_t* kextSections = NULL;
 
 void KernelPatcher_start()
 {
-    register_kernel_patch(patch_cpuid_set_info_all,     KERNEL_ANY, CPU_MODEL_UNKNOWN);
+    register_kernel_patch(patch_cpuid_set_info_all,     KERNEL_ANY, CPUID_MODEL_UNKNOWN);
     
-    register_kernel_patch(patch_commpage_stuff_routine, KERNEL_ANY, CPU_MODEL_ANY);
-    register_kernel_patch(patch_lapic_init,             KERNEL_ANY, CPU_MODEL_ANY);
-    register_kernel_patch(patch_lapic_interrupt,             KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_commpage_stuff_routine, KERNEL_ANY, CPUID_MODEL_ANY);
+    register_kernel_patch(patch_lapic_init,             KERNEL_ANY, CPUID_MODEL_ANY);
+    register_kernel_patch(patch_lapic_interrupt,        KERNEL_ANY, CPUID_MODEL_ANY);
     
     // NOTE: following is currently 32bit only
-    register_kernel_patch(patch_lapic_configure,        KERNEL_32, CPU_MODEL_ANY);
+    register_kernel_patch(patch_lapic_configure,        KERNEL_32,  CPUID_MODEL_ANY);
     
-    register_kernel_patch(patch_readStartupExtensions,  KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_readStartupExtensions,  KERNEL_ANY, CPUID_MODEL_ANY);
     
-    register_kernel_patch(patch_pmKextRegister,        KERNEL_ANY, CPU_MODEL_ANY);
-    //register_kernel_patch(patch_pmCPUExitHaltToOff,        KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_pmKextRegister,         KERNEL_ANY, CPUID_MODEL_ANY);
+    //register_kernel_patch(patch_pmCPUExitHaltToOff,     KERNEL_ANY, CPUID_MODEL_ANY);
     
-    register_kernel_patch(patch_xcpm_msr, KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_xcpm_msr,               KERNEL_ANY, CPU_MODEL_ANY);
 
-    register_kernel_patch(patch_kexts,        KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_kexts,                  KERNEL_ANY, CPU_MODEL_ANY);
 
     
     register_section("__KLD", "__text");
@@ -138,7 +138,7 @@ void load32KernelPatcherKexts(void* kernelBinary, void* kernelFinal, void* arg3,
     char* kextname = malloc(1024);
     char* name;
 	long flags;
-	long time;
+	u_int32_t time;
 	struct dirstuff* kextsDir = opendir(KPDefaultKexts);
 	while(readdir(kextsDir, (const char**)&name, &flags, &time) >= 0)
 	{
@@ -395,13 +395,13 @@ void register_kernel_patch(void* patch, int arch, int cpus)
 				switch(Platform.CPU.Model)
 				{
 					case 13:
-					case CPU_MODEL_YONAH:
-					case CPU_MODEL_MEROM:
-					case CPU_MODEL_PENRYN:
-					case CPU_MODEL_NEHALEM:
-					case CPU_MODEL_FIELDS:
-					case CPU_MODEL_DALES:
-					case CPU_MODEL_NEHALEM_EX:
+					case CPUID_MODEL_YONAH:
+					case CPUID_MODEL_MEROM:
+					case CPUID_MODEL_PENRYN:
+					case CPUID_MODEL_NEHALEM:
+					case CPUID_MODEL_FIELDS:
+					case CPUID_MODEL_DALES:
+					case CPUID_MODEL_NEHALEM_EX:
 						// Known cpu's we don't want to add the patch
 						return;
 						break;
