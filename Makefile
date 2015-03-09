@@ -19,7 +19,8 @@ endif
 include ../MakeInc.dir
 
 ifeq (${MAKECMDGOALS},xnu_patcher)
-CFLAGS += -m32 -D__LITTLE_ENDIAN__ -Wno-multichar -Wno-int-to-pointer-cast
+override CFLAGS = -m32 -D__LITTLE_ENDIAN__ -Wno-multichar -Wno-int-to-pointer-cast
+#override INC := ${filter-out -I$(SRCROOT)/i386/include/,${INC}}
 endif
 
 #all: ${SYMROOT}/xnu_patcher

@@ -12,8 +12,7 @@
 #define TOSTRING(x) STRINGIFY(x)
 
 #define HEADER      __FILE__ "[" TOSTRING(__LINE__) "]: "
-
-
+#define __DARWIN_ONLY_UNIX_CONFORMANCE	1
 #define ERROR_INVALID_PARAMS    -1
 #define ERROR_FOPEN             -2
 

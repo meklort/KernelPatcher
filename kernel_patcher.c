@@ -9,11 +9,11 @@
 
 #include "libsaio.h"
 #include "kernel_patcher.h"
-#include <libsaio/platform.h>
+#include <../trunk/i386/libsaio/platform.h>
 #include "modules.h"
-#include <libsaio/xml.h>
+#include <../trunk/i386/libsaio/xml.h>
 #include "sl.h"
-#include <libsaio/bootstruct.h>
+#include <../trunk/i386/libsaio/bootstruct.h>
 
 #define DBG     printf
 //fixme ^^^
@@ -73,16 +73,16 @@ sectionList_t* kextSections = NULL;
 
 void KernelPatcher_start()
 {
-	register_kernel_patch(patch_cpuid_set_info_all,     KERNEL_ANY, CPU_MODEL_UNKNOWN);
+    register_kernel_patch(patch_cpuid_set_info_all,     KERNEL_ANY, CPU_MODEL_UNKNOWN);
     
-	register_kernel_patch(patch_commpage_stuff_routine, KERNEL_ANY, CPU_MODEL_ANY);
-	register_kernel_patch(patch_lapic_init,             KERNEL_ANY, CPU_MODEL_ANY);
-	register_kernel_patch(patch_lapic_interrupt,             KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_commpage_stuff_routine, KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_lapic_init,             KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_lapic_interrupt,             KERNEL_ANY, CPU_MODEL_ANY);
     
-	// NOTE: following is currently 32bit only
-	register_kernel_patch(patch_lapic_configure,        KERNEL_32, CPU_MODEL_ANY);
+    // NOTE: following is currently 32bit only
+    register_kernel_patch(patch_lapic_configure,        KERNEL_32, CPU_MODEL_ANY);
     
-	register_kernel_patch(patch_readStartupExtensions,  KERNEL_ANY, CPU_MODEL_ANY);
+    register_kernel_patch(patch_readStartupExtensions,  KERNEL_ANY, CPU_MODEL_ANY);
     
     register_kernel_patch(patch_pmKextRegister,        KERNEL_ANY, CPU_MODEL_ANY);
     //register_kernel_patch(patch_pmCPUExitHaltToOff,        KERNEL_ANY, CPU_MODEL_ANY);
@@ -98,7 +98,7 @@ void KernelPatcher_start()
     register_section("__PRELINK_INFO","__info");
     register_section("__DATA","__data");
     
-	register_hook_callback("DecodeKernel", &patch_kernel); 
+    register_hook_callback("DecodeKernel", &patch_kernel); 
     register_hook_callback("DecodedKernel", &loadKernelPatcherKexts);
 }
 

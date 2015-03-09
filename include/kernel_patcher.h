@@ -14,7 +14,7 @@
 #include <mach-o/reloc.h>
 
 #include "modules.h"
-#include <libsaio/cpu.h>
+#include <../trunk/i386/libsaio/cpu.h>
 #define CPU_MODEL_ANY		0x00
 #define CPU_MODEL_UNKNOWN	0x01
 
