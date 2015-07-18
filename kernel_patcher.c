@@ -559,9 +559,9 @@ void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4)
 
     verbose(HEADER "Patching %dbit XNU Kernel %d.%d.%d\n%s\n", 
 		   arch == KERNEL_32 ? 32 : 64, 
-		   version_major ? *version_major : 0, 
-		   version_minor ? *version_minor : 0, 
-		   version_rev   ? *version_rev : 0, version_str);
+		   (unsigned int)(version_major ? *version_major : 0), 
+		   (unsigned int)(version_minor ? *version_minor : 0), 
+		   (unsigned int)(version_rev   ? *version_rev : 0), version_str);
 
     patchRoutine_t* kernelPatch = patches;
     while(kernelPatch)
