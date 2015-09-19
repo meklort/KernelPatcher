@@ -540,7 +540,7 @@ UInt32 get_cpuid_family_addr_64(void* kernelData)
     
     UInt32 functionStart = symbol ? kernelData + symbol->addr - txt->address + txt->offset: 0;
     
-    UInt32 findAddr = set_info ? kernelData + set_info->addr - txt->address + txt->offset - (UInt32)bytes: 0;
+    UInt32 findAddr = set_info ? set_info->addr - txt->address + txt->offset: 0;
     
     UInt32 position = functionStart - (UInt32)bytes;
     
