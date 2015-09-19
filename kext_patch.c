@@ -50,9 +50,6 @@ void patch_kexts(void* kernelData)
 
 	section_t* txt = lookup_section("__PRELINK_TEXT","__text");
     section_t* info = lookup_section("__PRELINK_INFO","__info");
-
-    UInt32 prelinked_info = info->offset; // location of plist in file
-
 	if(!txt)
 	{
 		printf(HEADER "Unable to locate __PRELINK_TEXT,__text\n");
@@ -64,22 +61,26 @@ void patch_kexts(void* kernelData)
 		printf(HEADER "Unable to locate __PRELINK_INFO,__info\n");
 		return;
 	}
-    
-    XMLParseFile((char*)&bytes[prelinked_info], &prelinkInfo);
+
+    //printf(HEADER "XML is %s\n", (char*)&bytes[info->offset]);
+	XMLParseFile((char*)&bytes[info->offset], &prelinkInfo);
     if(prelinkInfo)
     {
+#if 1
         if(XMLCastDict(prelinkInfo))
         {
             int numelements = XMLTagCount(prelinkInfo);
             int i;
+			printf(HEADER "Found %d elements\n", numelements);
 
             for(i = 0; i < numelements; i++)
             {
                 TagPtr key = XMLGetKey(prelinkInfo, i);
                 char* name = NULL;
                 if(key) name = XMLCastString(key);
-
-                if(strcmp(name, "_PrelinkInfoDictionary") == 0)
+				printf(HEADER "Parsing xml key %s\n", name);
+				
+                if(name && strcmp(name, "_PrelinkInfoDictionary") == 0)
                 {
                     TagPtr info = XMLGetProperty(prelinkInfo, name);
                     if(XMLCastArray(info))
@@ -101,5 +102,6 @@ void patch_kexts(void* kernelData)
                 }
             }
         }
+#endif
     }
 }

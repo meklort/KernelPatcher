@@ -42,9 +42,6 @@ void patch_pmCPUExitHaltToOff(void* kernelData)
 		return;
 	}
 	
-	patchLocation -= (UInt32)kernelData;	// Remove offset
-	
-	
 	
 	while(bytes[patchLocation - 1]	!= 0xB8 ||
 		  bytes[patchLocation]		!= 0x04 ||	// KERN_INVALID_ARGUMENT (0x00000004)
@@ -88,9 +85,6 @@ void patch_pmKextRegister(void* kernelData)
 	}
 	UInt32 panicAddr = symbol->addr - txt->address; 
     
-	patchLocation -= (UInt32)kernelData;
-	panicAddr -= (UInt32)kernelData;
-	
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) ||
 		  ( ( (UInt32)(panicAddr - patchLocation  - 4) + txt->offset ) != (UInt32)((bytes[patchLocation + 0] << 0  | 

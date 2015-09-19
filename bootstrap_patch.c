@@ -51,11 +51,6 @@ void patch_readStartupExtensions(void* kernelData)
     
     UInt32 patchLocation = readPrelinkedExtensionsLocation;
 
-    patchLocation                -= (UInt32)kernelData;
-    OSKextLogLocation            -= (UInt32)kernelData;
-    readBooterExtensionsLocation -= (UInt32)kernelData;
-	getsegbynameLocation         -= (UInt32)kernelData;
-
     // Step 1: Locate the first getsegbyname() call inside of __ZN12KLDBootstrap23readPrelinkedExtensionsEP10section
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) || /* Call */

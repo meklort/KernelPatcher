@@ -42,7 +42,7 @@ void patch_xcpm_msr(void* kernelData)
 	UInt32 addr = data->address;
 	UInt32 offset = data->offset;
 	
-	msr_t* msrs = (void*)((UInt32)&bytes[(UInt32)(symbol->addr - data->address + data->offset)] - (UInt32)kernelData);
+	msr_t* msrs = (void*)((UInt32)&bytes[(UInt32)(symbol->addr - data->address + data->offset)]);
 		 
 	// TODO: chose better end condiont (such as end of variable)
 	for(i = 0; i < 10; i++)

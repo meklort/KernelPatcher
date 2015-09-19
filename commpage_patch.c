@@ -53,10 +53,6 @@ void patch_commpage_stuff_routine(void* kernelData)
 		return;
 	}
 	UInt32 panicAddr = symbol->addr - txt->address;
-
-    patchLocation -= (UInt32)kernelData;
-	panicAddr -= (UInt32)kernelData;
-
     
     while(numPatches)
     {

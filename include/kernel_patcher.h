@@ -26,6 +26,7 @@
 
 typedef struct patchRoutine_t
 {
+	const char* name;
 	void(*patchRoutine)(void*);
 	int validArchs;
 	int validCpu;
@@ -56,12 +57,12 @@ symbolList_t* lookup_kernel_symbol(const char* name);
 void register_kernel_symbol(int kernelType, const char* name);
 
 section_t* lookup_section(const char* segment, const char* section);
-void register_section(const char* segment, const char* section);
+section_t* register_section(const char* segment, const char* section);
 
 
 long long symbol_handler(char* symbolName, long long addr, char is64);
 void patch_kernel(void* kernelData, void* arg2, void* arg3, void *arg4);
-void register_kernel_patch(void* patch, int arch, int cpus);
+void register_kernel_patch(const char* name, void* patch, int arch, int cpus);
 
 int locate_symbols(void* kernelData);
 

@@ -47,9 +47,6 @@ void patch_lapic_init(void* kernelData)
 		return;
 	}
 	
-	patchLocation -= (UInt32)kernelData;	// Remove offset
-	panicAddr -= (UInt32)kernelData;	// Remove offset
-    
 	
 	
 	
@@ -111,9 +108,6 @@ void patch_lapic_interrupt(void* kernelData)
 		return;
 	}
 	UInt32 panicAddr = symbol->addr - txt->address; 
-	
-	patchLocation -= (UInt32)kernelData;
-	panicAddr -= (UInt32)kernelData;
 	
 	while(  
 		  (bytes[patchLocation -1] != 0xE8) ||
@@ -179,9 +173,6 @@ void patch_lapic_configure(void* kernelData)
 		return;
 	}
 	lapicInterruptBase = symbol->addr;
-	patchLocation -= (UInt32)kernelData;
-	lapicStart -= (UInt32)kernelData;
-	lapicInterruptBase -= (UInt32)kernelData;
 	
 	
 	// Looking for the following:

@@ -362,6 +362,7 @@ DecodeKernel_patcher(void *binary)
 			printf(HEADER "kernel compression is bad\n");
 			return -1;
 		}
+		printf(HEADER "Decompressed kernel is %d bytes\n", uncompressed_size);
 	}
 	
     // Notify modules that the kernel has been decompressed, thinned and is about to be decoded

@@ -76,7 +76,6 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	symbolList_t *symbol = lookup_kernel_symbol("_cpuid_set_info");
 	
 	UInt32 patchLocation = symbol ? symbol->addr - txt->address + txt->offset: 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - txt->address + txt->offset);
-	patchLocation -= (UInt32)kernelData;	// Remove offset
 	
 	/** Remove the PANIC for unknown cpu **/
     
@@ -87,8 +86,6 @@ void patch_cpuid_set_info_64(void* kernelData, UInt32 impersonateFamily, UInt8 i
         msglog(HEADER "Unable to locate _panic\n");
         return;
     }
-    panicAddr -= (UInt32)kernelData;
-    
     
     
     //TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
@@ -182,8 +179,6 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
 	symbolList_t *symbol = lookup_kernel_symbol("_cpuid_set_info");
     
 	UInt32 patchLocation = symbol ? symbol->addr - txt->address + txt->offset: 0; //	(kernelSymbolAddresses[SYMBOL_CPUID_SET_INFO] - txt->address + txt->offset);
-	patchLocation -= (UInt32)kernelData;	// Remove offset
-	
     
 	UInt32 jumpLocation = 0;
 	
@@ -205,8 +200,6 @@ void patch_cpuid_set_info_32(void* kernelData, UInt32 impersonateFamily, UInt8 i
         msglog(HEADER "Unable to locate _panic\n");
         return;
     }
-    panicAddr -= (UInt32)kernelData;
-    
     
     
     //TODO: don't assume it'll always work (Look for *next* function address in symtab and fail once it's been reached)
@@ -545,9 +538,9 @@ UInt32 get_cpuid_family_addr_64(void* kernelData)
 	symbolList_t *set_info = lookup_kernel_symbol("_cpuid_set_info");
 	symbolList_t *symbol = lookup_kernel_symbol("_cpuid_family");
     
-    UInt32 functionStart = symbol ? symbol->addr - txt->address + txt->offset: 0;
+    UInt32 functionStart = symbol ? kernelData + symbol->addr - txt->address + txt->offset: 0;
     
-    UInt32 findAddr = set_info ? set_info->addr - txt->address + txt->offset - (UInt32)bytes: 0;
+    UInt32 findAddr = set_info ? kernelData + set_info->addr - txt->address + txt->offset - (UInt32)bytes: 0;
     
     UInt32 position = functionStart - (UInt32)bytes;
     
