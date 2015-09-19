@@ -27,7 +27,7 @@ endif
 
 xnu_patcher: 	${OBJROOT} $(addprefix $(OBJROOT)/, $(PATCHER_OBJS)) $(OBJROOT)/../../boot2/macho.o $(OBJROOT)/../../boot2/modules.o \
 		$(OBJROOT)/../../boot2/hooks.o \
-		$(OBJROOT)/../Chameleon/lzss.o $(OBJROOT)/../Chameleon/libsaio/xml.o $(OBJROOT)/../Chameleon/libsaio/base64-decode.o
+		$(OBJROOT)/../Chameleon/trunk/i386/boot2/lzss.o $(OBJROOT)/../Chameleon/trunk/i386/boot2/lzvn.o $(OBJROOT)/../Chameleon/trunk/i386/libsaio/xml.o $(OBJROOT)/../Chameleon/trunk/i386/libsaio/base64-decode.o
 	@echo "	[LD] $@"
 	${PRINT}$(CC) -m32 $(filter %.o,$^) -o $@
 	@rm $(OBJROOT)/main.o

@@ -45,6 +45,8 @@ boot_args *bootArgs;
 cpu_type_t archCpuType=CPU_TYPE_X86_64;
 struct multiboot_info *gMI = NULL;
 
+char __data_start;
+
 // external functions not in a header file.
 extern u_int8_t *compress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srcLen);
 
@@ -176,12 +178,13 @@ int verbose(const char *format, ...)
     return 0;
 }
 
-void msglog(const char * format, ...)
+int msglog(const char * format, ...)
 {
     va_list ap;
 	va_start(ap, format);
     vprintf(format, ap);
     va_end(ap);
+	return 0;
 }
 
 /* stop is needed by xml code */
@@ -297,7 +300,7 @@ DecodeKernel_patcher(void *binary)
 	compressed_kernel_header * kernel_header = (compressed_kernel_header *) binary;
 	u_int32_t uncompressed_size, size;
 	void *buffer;
-    u_int8_t* dstEnd;
+    u_int8_t* dstEnd = NULL;
 	
 #if 0
 	printf("kernel header:\n");
@@ -310,33 +313,53 @@ DecodeKernel_patcher(void *binary)
 	
 	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
 	{
-        printf(HEADER "Found compressed kernel, decompressing...\n");
-		if (kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss'))
+		union {
+			u_int32_t i;
+			char	  c[4];
+		} convert;
+		convert.i = kernel_header->compress_type;
+        printf(HEADER "Found compressed kernel (type '%c%c%c%c'), decompressing...\n", convert.c[0], convert.c[1], convert.c[2], convert.c[3]);
+		if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
+		{
+			uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
+			binary = buffer = (char*)malloc(uncompressed_size);
+			
+			size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
+								   OSSwapBigToHostInt32(kernel_header->compressed_size));
+			if (uncompressed_size != size) {
+				printf(HEADER "size mismatch from lzss: %x\n", size);
+				return -1;
+			}
+			
+			if (OSSwapBigToHostInt32(kernel_header->adler32) !=
+				Adler32(binary, uncompressed_size))
+			{
+				printf(HEADER "adler mismatch\n");
+				return -1;
+			}
+		}
+		else if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
+		{
+			uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
+			binary = buffer = (char*)malloc(uncompressed_size);
+			
+			size = lzvn_decode(binary, uncompressed_size, &kernel_header->data[0], OSSwapBigToHostInt32(kernel_header->compressed_size));
+
+			if (uncompressed_size != size) {
+				printf(HEADER "size mismatch from lzvn: %x\n", size);
+				return -1;
+			}
+			
+			if (OSSwapBigToHostInt32(kernel_header->adler32) !=
+				Adler32(binary, uncompressed_size))
+			{
+				printf(HEADER "adler mismatch\n");
+				return -1;
+			}
+		}
+        else
 		{
 			printf(HEADER "kernel compression is bad\n");
-			return -1;
-		}
-        
-#if NOTDEF
-		if (kernel_header->platform_name[0] && strcmp(gPlatformName, kernel_header->platform_name))
-			return -1;
-		if (kernel_header->root_path[0] && strcmp(gBootFile, kernel_header->root_path))
-			return -1;
-#endif
-		uncompressed_size = OSSwapBigToHostInt32(kernel_header->uncompressed_size);
-		binary = buffer = (char*)malloc(uncompressed_size);
-		
-		size = decompress_lzss((u_int8_t *) binary, &kernel_header->data[0],
-							   OSSwapBigToHostInt32(kernel_header->compressed_size));
-		if (uncompressed_size != size) {
-			printf(HEADER "size mismatch from lzss: %x\n", size);
-			return -1;
-		}
-		
-		if (OSSwapBigToHostInt32(kernel_header->adler32) !=
-			Adler32(binary, uncompressed_size))
-		{
-			printf(HEADER "adler mismatch\n");
 			return -1;
 		}
 	}
@@ -346,14 +369,17 @@ DecodeKernel_patcher(void *binary)
     
     if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
     {
-        // Kernel was compressed, recompress patched kernel.
-        printf(HEADER "Compressing patched kernel\n");
-        dstEnd =
-        compress_lzss(&kernel_header->data[0],
-                      OSSwapBigToHostInt32(kernel_header->compressed_size),
-                      (u_int8_t*)binary,
-                      OSSwapBigToHostInt32(kernel_header->uncompressed_size));
-        
+		if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
+		{
+			// Kernel was compressed, recompress patched kernel.
+			printf(HEADER "Compressing patched kernel\n");
+			dstEnd =
+			compress_lzss(&kernel_header->data[0],
+						  OSSwapBigToHostInt32(kernel_header->compressed_size),
+						  (u_int8_t*)binary,
+						  OSSwapBigToHostInt32(kernel_header->uncompressed_size));
+		}
+		
         if(!dstEnd)
         {
             printf("\n");
