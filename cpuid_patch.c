@@ -520,7 +520,7 @@ UInt32 get_cpuid_cpu_info_addr_64(void* kernelData)
     return cpuid_cpu_info;/* - txt->address + txt->offset;*/    // TODO: verify for kernel version 
 }
 
-
+#if 0
 UInt32 get_cpuid_family_addr_64(void* kernelData)
 {
 	section_t* txt = lookup_section("__TEXT","__text");
@@ -538,9 +538,9 @@ UInt32 get_cpuid_family_addr_64(void* kernelData)
 	symbolList_t *set_info = lookup_kernel_symbol("_cpuid_set_info");
 	symbolList_t *symbol = lookup_kernel_symbol("_cpuid_family");
     
-    UInt32 functionStart = symbol ? kernelData + symbol->addr - txt->address + txt->offset: 0;
+    UInt32 functionStart = symbol ? (UInt32)(kernelData + symbol->addr - txt->address + txt->offset): 0;
     
-    UInt32 findAddr = set_info ? set_info->addr - txt->address + txt->offset: 0;
+    UInt32 findAddr = set_info ? (UInt32)(set_info->addr - txt->address + txt->offset): 0;
     
     UInt32 position = functionStart - (UInt32)bytes;
     
@@ -564,3 +564,4 @@ UInt32 get_cpuid_family_addr_64(void* kernelData)
     //printf("get_cpuid_family_addr: 0x%X\n", cpuid_cpu_info + txt->address -  txt->offset);
     return cpuid_cpu_info + cpufamily;    // TODO: verify for kernel version 
 }
+#endif
